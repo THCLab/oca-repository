@@ -5,8 +5,8 @@ class NewRecordService
     @es = es
   end
 
-  def call(filename:, json:)
+  def call(hashlink:, schema:)
     es.index(:odca).type(:schema)
-      .put(filename, { json: json } )
+      .put(hashlink, { json: schema } )
   end
 end

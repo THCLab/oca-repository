@@ -1,8 +1,10 @@
 require 'roda'
 require 'stretcher'
+require 'json'
 
 require './lib/new_record_service'
 require './lib/search_service'
+require './lib/hashlink_generator'
 
 class Web < Roda
   plugin :json
@@ -15,15 +17,17 @@ class Web < Roda
     end
 
     r.post 'new' do
-      return 'Provide "filename" param' unless r.params['filename']
-      return 'Provide "json" param' unless r.params['json']
+      return 'Provide "schema" param' unless r.params['schema']
       service = NewRecordService.new(es)
-      service.call(filename: r.params['filename'], json: r.params['json'])
+
+      hashlink = HashlinkGenerator.call(JSON.parse(r.params['schema']))
+      service.call(hashlink: hashlink, schema: r.params['schema'])
+      hashlink
     end
 
     r.get 'search' do
       service = SearchService.new(es)
-      service.call(r.params['q'])
+      service.call(r.params['hashlink'], r.params['q'])
     end
   end
 end
