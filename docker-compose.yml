@@ -1,0 +1,32 @@
+version: '3'
+services:
+  odca_search_engine:
+    image: odca-search-engine
+    build: ./
+    command: /bin/bash -c " bundle exec rackup -o 0.0.0.0"
+    ports:
+      - 9292:9292
+    networks:
+      - elastic
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+volumes:
+  data01:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
