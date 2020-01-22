@@ -9,11 +9,11 @@ module Schemas
         @es = es
       end
 
-      def call(query)
-        results = if query
-                    search_by_query(query)
-                  else
+      def call(params)
+        results = if params.empty?
                     search_all
+                  else
+                    search_by_params(params)
                   end
 
         results.raw_plain['hits']['hits'].map do |r|
@@ -33,14 +33,20 @@ module Schemas
         )
       end
 
-      private def search_by_query(query)
+      private def search_by_params(params)
+        query = if params['q']
+                  { multi_match: { query: params['q'] } }
+                else
+                  {
+                    bool: {
+                      must: params.map do |p|
+                        { match: { p[0] => p[1] } }
+                      end
+                    }
+                  }
+                end
         es.index(:odca).type(:schema)
-          .search(
-            size: 1000,
-            query: {
-              multi_match: { query: query }
-            }
-          )
+          .search(size: 1000, query: query)
       end
     end
   end

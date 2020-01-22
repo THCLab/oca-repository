@@ -24,7 +24,7 @@ class Web < Roda
 
       r.get do
         service = Schemas::Services::SearchSchemasService.new(es)
-        service.call(r.params['q'])
+        service.call(r.params)
       end
 
       r.post 'new' do
