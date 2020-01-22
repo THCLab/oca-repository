@@ -1,4 +1,4 @@
-class NewRecordService
+class NewSchemaService
   attr_reader :es
 
   def initialize(es)
