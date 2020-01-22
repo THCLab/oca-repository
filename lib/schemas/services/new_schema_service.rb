@@ -11,7 +11,7 @@ module Schemas
 
       def call(hashlink:, schema:)
         es.index(:odca).type(:schema)
-          .put(hashlink, { json: schema } )
+          .put(hashlink, schema)
       end
     end
   end

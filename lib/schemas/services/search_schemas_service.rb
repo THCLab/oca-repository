@@ -19,23 +19,28 @@ module Schemas
         results.raw_plain['hits']['hits'].map do |r|
           {
             hashlink: r.fetch('_id'),
-            schema: r.fetch('_source').fetch('json')
+            schema: r.fetch('_source')
           }
         end
       end
 
       private def search_all(size: 20)
-        es.index(:odca).type(:schema)
-          .search(size: size, query: {
-            match_all: { }
-          })
+        es.index(:odca).type(:schema).search(
+          size: size,
+          query: {
+            match_all: {}
+          }
+        )
       end
 
       private def search_by_query(query)
         es.index(:odca).type(:schema)
-          .search(size: 1000, query: {
-            match: { json: query }
-          })
+          .search(
+            size: 1000,
+            query: {
+              multi_match: { query: query }
+            }
+          )
       end
     end
   end

@@ -10,7 +10,7 @@ module Schemas
       end
 
       def call(id)
-        by_id(id).fetch('json')
+        by_id(id)
       end
 
       private def by_id(id)
