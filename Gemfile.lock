@@ -14,7 +14,7 @@ GEM
     multi_json (1.14.1)
     multipart-post (1.2.0)
     rack (2.1.1)
-    roda (2.1.0)
+    roda (3.28.0)
       rack
     stretcher (1.21.1)
       excon (>= 0.16)
@@ -30,7 +30,7 @@ PLATFORMS
 DEPENDENCIES
   base58 (~> 0.2)
   faraday (= 0.8.9)
-  roda (~> 2.1.0)
+  roda (~> 3.22)
   stretcher (~> 1.21)
 
 BUNDLED WITH
