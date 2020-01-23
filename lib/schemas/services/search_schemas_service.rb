@@ -10,17 +10,21 @@ module Schemas
       end
 
       def call(params)
-        results = if params.empty?
-                    search_all
-                  else
-                    search_by_params(params)
-                  end
+        begin
+          results = if params.empty?
+                      search_all
+                    else
+                      search_by_params(params)
+                    end
 
-        results.raw_plain['hits']['hits'].map do |r|
-          {
-            hashlink: r.fetch('_id'),
-            schema: r.fetch('_source')
-          }
+          results.raw_plain['hits']['hits'].map do |r|
+            {
+              hashlink: r.fetch('_id'),
+              schema: r.fetch('_source')
+            }
+          end
+        rescue
+          []
         end
       end
 
