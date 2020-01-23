@@ -1,9 +1,11 @@
 require 'roda'
 require 'stretcher'
 require 'json'
+require 'plugins/cors'
 
 class Web < Roda
   plugin :json
+  plugin :cors
 
   route do |r|
     if WEBrick::HTTPRequest.const_get('MAX_URI_LENGTH') < 104_857_60
@@ -35,6 +37,10 @@ class Web < Roda
         service.call(hashlink: hashlink, schema: schema)
         hashlink
       end
+    end
+
+    r.get 'api' do
+      r.redirect('http://localhost:8000')
     end
   end
 end
