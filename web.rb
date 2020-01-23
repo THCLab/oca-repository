@@ -27,14 +27,12 @@ class Web < Roda
         service.call(r.params)
       end
 
-      r.post 'new' do
-        return 'Provide "schema" param' unless r.params['schema']
+      r.post do
         service = Schemas::Services::NewSchemaService.new(es)
+        schema = JSON.parse(r.body.read)
 
-        hashlink = Schemas::HashlinkGenerator.call(
-          JSON.parse(r.params['schema'])
-        )
-        service.call(hashlink: hashlink, schema: r.params['schema'])
+        hashlink = Schemas::HashlinkGenerator.call(schema)
+        service.call(hashlink: hashlink, schema: schema)
         hashlink
       end
     end
