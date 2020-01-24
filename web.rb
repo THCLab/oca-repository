@@ -5,6 +5,7 @@ require 'plugins/cors'
 
 class Web < Roda
   plugin :json
+  plugin :json_parser
   plugin :cors
 
   route do |r|
@@ -31,7 +32,7 @@ class Web < Roda
 
       r.post do
         service = Schemas::Services::NewSchemaService.new(es)
-        schema = JSON.parse(r.body.read)
+        schema = r.params
 
         hashlink = Schemas::HashlinkGenerator.call(schema)
         service.call(hashlink: hashlink, schema: schema)
