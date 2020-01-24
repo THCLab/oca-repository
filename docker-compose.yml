@@ -2,6 +2,7 @@ version: '3'
 services:
   odca_search_engine:
     image: odca-search-engine
+    container_name: ocarepository
     build: ./
     command: /bin/bash -c " bundle exec rackup -o 0.0.0.0"
     ports:
