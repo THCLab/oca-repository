@@ -27,19 +27,17 @@
         "consumes": [
           "application/json"
         ],
-        "produces": [
-          "text/plain"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "schema",
-            "description": "Schema object that needs to be added",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Schema"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/Schema"
+              }
             }
           }
+        },
+        "produces": [
+          "text/plain"
         ],
         "responses": {
           "200": {
