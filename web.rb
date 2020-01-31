@@ -9,10 +9,6 @@ class Web < Roda
   plugin :cors
 
   route do |r|
-    if WEBrick::HTTPRequest.const_get('MAX_URI_LENGTH') < 104_857_60
-      WEBrick::HTTPRequest.const_set('MAX_URI_LENGTH', 104_857_60)
-    end
-
     es = Stretcher::Server.new('http://es01:9200')
 
     r.root do
