@@ -9,6 +9,15 @@
 
 `GET /api` redirects to Swagger
 
+In order to push all json files from current directory (and nested subdirectories) you can use bash script:
+```
+for f in **/*.json
+do
+    curl -X POST $_host_/schemas -d "@$f"
+    echo \\n $f
+done
+```
+
 ### Development
 
 1. Build docker image  

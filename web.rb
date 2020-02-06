@@ -2,17 +2,15 @@ require 'roda'
 require 'stretcher'
 require 'json'
 require 'plugins/cors'
+require 'plugins/json_header'
 
 class Web < Roda
   plugin :json
   plugin :json_parser
+  plugin :json_header
   plugin :cors
 
   route do |r|
-    if WEBrick::HTTPRequest.const_get('MAX_URI_LENGTH') < 104_857_60
-      WEBrick::HTTPRequest.const_set('MAX_URI_LENGTH', 104_857_60)
-    end
-
     es = Stretcher::Server.new('http://es01:9200')
 
     r.root do
