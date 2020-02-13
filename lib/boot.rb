@@ -16,6 +16,8 @@ until es_updated
     es_updated = true
   rescue Faraday::Error::ConnectionFailed
     sleep 1
+  rescue Faraday::Error::TimeoutError
+    sleep 1
   rescue Stretcher::RequestError::NotFound => e
     es.index(e.http_response.env[:body]['error']['index']).create
   end
