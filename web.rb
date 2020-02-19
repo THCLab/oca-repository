@@ -38,8 +38,17 @@ class Web < Roda
       end
     end
 
-    r.get 'api' do
-      r.redirect('http://localhost:8000')
+    r.on 'v2' do
+      r.on 'schemas' do
+        r.post do
+          service = Schemas::Services::V2::ImportSchemaService.new(
+            es, ::Schemas::HashlinkGenerator
+          )
+          hashlink = service.call(r.params)
+
+          hashlink
+        end
+      end
     end
   end
 end

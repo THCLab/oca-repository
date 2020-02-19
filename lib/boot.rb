@@ -3,6 +3,7 @@ require 'stretcher'
 
 Dir["#{LIB_PATH}/schemas/*.rb"].each { |file| require file }
 Dir["#{LIB_PATH}/schemas/services/*.rb"].each { |file| require file }
+Dir["#{LIB_PATH}/schemas/services/v2/*.rb"].each { |file| require file }
 
 es_config = YAML.load_file("#{ROOT_PATH}/config/elastic_search.yml")
 es = Stretcher::Server.new('http://es01:9200')
