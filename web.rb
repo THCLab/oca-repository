@@ -40,6 +40,11 @@ class Web < Roda
 
     r.on 'v2' do
       r.on 'schemas' do
+        r.get String do |id|
+          service = Schemas::Services::V2::GetSchemaService.new(es)
+          service.call(id)
+        end
+
         r.post do
           service = Schemas::Services::V2::ImportSchemaService.new(
             es, ::Schemas::HashlinkGenerator
