@@ -45,6 +45,11 @@ class Web < Roda
           service.call(id)
         end
 
+        r.get do
+          service = Schemas::Services::V2::SearchSchemasService.new(es)
+          service.call(r.params)
+        end
+
         r.post do
           service = Schemas::Services::V2::ImportSchemaService.new(
             es, ::Schemas::HashlinkGenerator
