@@ -11,18 +11,37 @@ module Schemas
         end
 
         def call(id)
-          record = by_id(id)
+          record = by_id(id, %i[schema_base branch])
           return unless record
-          record[:_source]
+          if record[:_index] == 'schema_base'
+            record[:_source]
+          elsif record[:_index] == 'branch'
+            resolve_branch(record[:_source])
+          end
         end
 
-        private def by_id(id)
-          es.mget(
-            %i[schema_base branch].map do |index|
+        private def resolve_branch(branch)
+          schema_base = by_id(branch[:schema_base], :schema_base)[:_source]
+          overlays = by_ids(branch[:overlays], :overlay).map { |r| r[:_source] }
+          {
+            schema_base: schema_base,
+            overlays: overlays
+          }
+        end
+
+        private def by_id(id, indexes)
+          by_ids([id], indexes).first
+        end
+
+        private def by_ids(ids, indexes)
+          indexes = [indexes] unless indexes.is_a? Array
+          docs = indexes.map do |index|
+            ids.map do |id|
               { _index: index, _id: id }
-            end,
-            exists: nil
-          ).find { |r| r[:found] == true }
+            end
+          end.flatten
+          es.mget(docs, exists: nil)
+            .select { |r| r[:found] == true }
         end
       end
     end
