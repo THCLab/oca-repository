@@ -11,12 +11,12 @@ module Schemas
         end
 
         def call(id)
-          record = by_id(id, %i[schema_base branch])
+          record = by_id(id, %i[schema_base branch odca])
           return unless record
-          if record[:_index] == 'schema_base'
-            record[:_source]
-          elsif record[:_index] == 'branch'
+          if record[:_index] == 'branch'
             resolve_branch(record[:_source])
+          else
+            record[:_source]
           end
         end
 
