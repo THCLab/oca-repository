@@ -3,3 +3,13 @@ odca:
     mapping:
       total_fields:
         limit: 10000
+schema_base:
+  index:
+    mapping:
+      total_fields:
+        limit: 10000
+overlay:
+  index:
+    mapping:
+      total_fields:
+        limit: 10000

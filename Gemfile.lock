@@ -16,6 +16,7 @@ GEM
     rack (2.1.1)
     roda (3.28.0)
       rack
+    rubyzip (2.2.0)
     stretcher (1.21.1)
       excon (>= 0.16)
       faraday (~> 0.8)
@@ -31,6 +32,7 @@ DEPENDENCIES
   base58 (~> 0.2)
   faraday (= 0.8.9)
   roda (~> 3.22)
+  rubyzip (~> 2.2)
   stretcher (~> 1.21)
 
 BUNDLED WITH
