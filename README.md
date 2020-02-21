@@ -11,7 +11,16 @@
 `GET /v2/schemas?q={query}` returns schemas which any field matches query  
 `GET /v2/schemas?{field1}={query1}&{field2}={query2}&...` returns schemas which given fields matches queries  
 `GET /v2/schemas/{hashlink}` returns schema json for given hashlink  
-`POST /v2/schemas` store schema given in request body file, returns hashlink
+`POST /v2/schemas` store schema given in form file, returns hashlin
+- Add schema base by uploading its JSON file
+- Add schema branch by uploading ZIP file with given structure:
+   ```bash
+   file.zip
+   ├── schemaName
+   │    ├── overlay1.json
+   │    └── overlay2.json
+   └── schemaName.json (schema base)
+   ```
 
 In order to push all json files from current directory (and nested subdirectories) you can use bash script:
 ```

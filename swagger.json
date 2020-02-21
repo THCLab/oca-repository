@@ -139,7 +139,7 @@
         "tags": [
           "v2/schemas"
         ],
-        "summary": "Add a new schema",
+        "summary": "Add schema by JSON or ZIP file",
         "description": "",
         "consumes": [
           "application/json"
@@ -152,7 +152,8 @@
                 "properties": {
                   "file": {
                     "type": "string",
-                    "format": "binary"
+                    "format": "binary",
+                    "description": "Select JSON file to upload schema base or ZIP file to upload schema branch"
                   }
                 }
               }
