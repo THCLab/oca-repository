@@ -135,46 +135,19 @@
     },
 
     "/v2/schemas": {
-      "post": {
-        "tags": [
-          "v2/schemas"
-        ],
-        "summary": "Add schema by JSON or ZIP file",
-        "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "Select JSON file to upload schema base or ZIP file to upload schema branch"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "produces": [
-          "text/plain"
-        ],
-        "responses": {
-          "200": {
-            "description": "Schema hashlink"
-          }
-        }
-      },
       "get": {
         "tags": [
           "v2/schemas"
         ],
         "summary": "Find schemas",
         "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Max number of results (default 1000)",
+            "type": "string"
+          },
           {
             "name": "q",
             "in": "query",
@@ -223,7 +196,117 @@
         }
       }
     },
-    "/v2/schemas/{hashlink}": {
+    "/v2/schemas/{namespace}": {
+      "post": {
+        "tags": [
+          "v2/schemas"
+        ],
+        "summary": "Add schema by JSON or ZIP file to specified namespace",
+        "description": "",
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Select JSON file to upload schema base or ZIP file to upload schema branch"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "produces": [
+          "text/plain"
+        ],
+        "responses": {
+          "200": {
+            "description": "Schema hashlink"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "v2/schemas"
+        ],
+        "summary": "Find schemas in specified namespace",
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Max number of results (default 1000)",
+            "type": "string"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Search in all schema fields",
+            "type": "string"
+          },
+          {
+            "name": "params",
+            "in": "query",
+            "required": false,
+            "description": "Search specified schema fields",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "hashlink": {
+                        "type": "string"
+                      },
+                      "schema": {
+                        "$ref": "#/definitions/Schema"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/schemas/{namespace}/{DRI}": {
       "get": {
         "tags": [
           "v2/schemas"
@@ -231,7 +314,13 @@
         "summary": "Find schema by hashlink",
         "parameters": [
           {
-            "name": "hashlink",
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "DRI",
             "in": "path",
             "required": true,
             "type": "string"
