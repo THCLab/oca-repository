@@ -7,11 +7,17 @@
 `GET /schemas/{hashlink}` returns schema json for given hashlink  
 `POST /schemas` store schema given in request body, returns hashlink
 
-`GET /v2/schemas` returns first 1000 schemas  
-`GET /v2/schemas?q={query}` returns schemas which any field matches query  
-`GET /v2/schemas?{field1}={query1}&{field2}={query2}&...` returns schemas which given fields matches queries  
-`GET /v2/schemas/{hashlink}` returns schema json for given hashlink  
-`POST /v2/schemas` store schema given in form file, returns hashlin
+##### v2
+`GET /v2/schemas` search for schemas  
+   ```
+   optional params:  
+      ?limit={number} - set max number of results to be returned (default 1000)  
+      ?q={query} - returns schemas which any field matches query  
+      ?{field1}={query1}&{field2}={query2}&... - returns schemas which given fields matches queries  
+   ```
+`GET /v2/schemas/{namespace}` search for schemas in specified namespace (optional params as listed above)  
+`GET /v2/schemas/{namespace}/{DRI}` returns schema json for given DRI in specified namespace  
+`POST /v2/schemas/{namespace}` store per namespace schema given in form file, returns DRI and url
 - Add schema base by uploading its JSON file
 - Add schema branch by uploading ZIP file with given structure:
    ```bash
@@ -21,15 +27,6 @@
    │    └── overlay2.json
    └── schemaName.json (schema base)
    ```
-
-In order to push all json files from current directory (and nested subdirectories) you can use bash script:
-```
-for f in **/*.json
-do
-    curl -X POST $_host_/schemas -d "@$f"
-    echo \\n $f
-done
-```
 
 ### Development
 

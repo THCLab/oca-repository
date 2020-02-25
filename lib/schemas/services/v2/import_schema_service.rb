@@ -13,13 +13,13 @@ module Schemas
           @hashlink_generator = hashlink_generator
         end
 
-        def call(raw_params)
+        def call(namespace, raw_params)
           params = validate(raw_params)
           type = params[:file][:filename].split('.').last
           if type == 'json'
-            store_json(params[:file][:tempfile])
+            store_json(namespace, params[:file][:tempfile])
           elsif type == 'zip'
-            store_zip(params[:file][:tempfile])
+            store_zip(namespace, params[:file][:tempfile])
           end
         end
 
@@ -30,21 +30,30 @@ module Schemas
           }
         end
 
-        private def store_json(file)
+        private def store_json(namespace, file)
           schema_base = JSON.parse(file.read)
           hashlink = hashlink_generator.call(schema_base)
-          es.index(:schema_base).bulk_index(
-            [schema_base.merge(_id: hashlink)]
-          )
+          record = {
+            _id: namespace + '/' + hashlink,
+            namespace: namespace,
+            DRI: hashlink,
+            data: schema_base
+          }
+          es.index(:schema_base).bulk_index([record])
           hashlink
         end
 
-        private def store_zip(file)
+        private def store_zip(namespace, file)
           schema = extract_zip(file)
           %i[schema_base overlay].each do |index|
             es.index(index).bulk_index(
               schema[index].map do |hashlink, content|
-                content.merge(_id: hashlink)
+                {
+                  _id: namespace + '/' + hashlink,
+                  namespace: namespace,
+                  DRI: hashlink,
+                  data: content
+                }
               end
             )
           end
@@ -53,9 +62,13 @@ module Schemas
             overlays: schema[:overlay].keys.sort
           }
           branch_hashlink = hashlink_generator.call(branch)
-          es.index(:branch).bulk_index(
-            [branch.merge(_id: branch_hashlink)]
-          )
+          branch_record = {
+            _id: namespace + '/' + branch_hashlink,
+            namespace: namespace,
+            DRI: branch_hashlink,
+            data: branch
+          }
+          es.index(:branch).bulk_index([branch_record])
           branch_hashlink
         end
 

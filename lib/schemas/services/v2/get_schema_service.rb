@@ -14,15 +14,20 @@ module Schemas
           record = by_id(id, %i[schema_base branch odca])
           return unless record
           if record[:_index] == 'branch'
-            resolve_branch(record[:_source])
+            resolve_branch(
+              record[:_source][:namespace],
+              record[:_source][:data]
+            )
           else
-            record[:_source]
+            record[:_source][:data]
           end
         end
 
-        private def resolve_branch(branch)
-          schema_base = by_id(branch[:schema_base], :schema_base)[:_source]
-          overlays = by_ids(branch[:overlays], :overlay).map { |r| r[:_source] }
+        private def resolve_branch(namespace, branch)
+          schema_base_id = namespace + '/' + branch[:schema_base]
+          schema_base = by_id(schema_base_id, :schema_base)[:_source][:data]
+          overlay_ids = branch[:overlays].map { |id| namespace + '/' + id }
+          overlays = by_ids(overlay_ids, :overlay).map { |r| r[:_source][:data] }
           {
             schema_base: schema_base,
             overlays: overlays

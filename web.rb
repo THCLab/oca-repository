@@ -40,23 +40,33 @@ class Web < Roda
 
     r.on 'v2' do
       r.on 'schemas' do
-        r.get String do |id|
-          service = Schemas::Services::V2::GetSchemaService.new(es)
-          service.call(id)
+        r.on String do |namespace|
+          r.get String do |dri|
+            service = Schemas::Services::V2::GetSchemaService.new(es)
+            service.call(namespace + '/' + dri)
+          end
+
+          r.get do
+            service = Schemas::Services::V2::SearchSchemasService.new(es)
+            service.call(r.params.merge(namespace: namespace))
+          end
+
+          r.post do
+            service = Schemas::Services::V2::ImportSchemaService.new(
+              es, ::Schemas::HashlinkGenerator
+            )
+            dri = service.call(namespace, r.params)
+
+            {
+              DRI: dri,
+              url: "#{r.base_url}/v2/schemas/#{namespace}/#{dri}"
+            }
+          end
         end
 
         r.get do
           service = Schemas::Services::V2::SearchSchemasService.new(es)
           service.call(r.params)
-        end
-
-        r.post do
-          service = Schemas::Services::V2::ImportSchemaService.new(
-            es, ::Schemas::HashlinkGenerator
-          )
-          hashlink = service.call(r.params)
-
-          hashlink
         end
       end
     end
