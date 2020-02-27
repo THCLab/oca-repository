@@ -11,7 +11,7 @@ module Schemas
         end
 
         def call(id)
-          record = by_id(id, %i[schema_base branch odca])
+          record = by_id(id, %i[schema_base overlay branch odca])
           return unless record
           if record[:_index] == 'branch'
             resolve_branch(
