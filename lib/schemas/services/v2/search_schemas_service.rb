@@ -36,7 +36,11 @@ module Schemas
             when :namespace
               memo[:bool][:must] << { match: { 'namespace' => value } }
             else
-              memo[:bool][:must] << { match: { 'data.' + key => value } }
+              memo[:bool][:must] << {
+                match: {
+                  (key[0] == '_' ? key : 'data.' + key) => value
+                }
+              }
             end
           end
           query = { match_all: {} } if query.empty?
