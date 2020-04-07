@@ -59,7 +59,7 @@ class Web < Roda
 
             {
               DRI: dri,
-              url: "#{r.base_url}/v2/schemas/#{namespace}/#{dri}"
+              url: "#{r.base_url}/api/v2/schemas/#{namespace}/#{dri}"
             }
           end
         end
