@@ -1,0 +1,105 @@
+openapi: 3.0.0
+info:
+  description: ''
+  version: 1.0.0
+  title: OCA Repository
+servers:
+  - url: 'http://localhost:9292/api'
+tags:
+  - name: schemas
+paths:
+  '/schemas':
+    post:
+      tags:
+        - schemas
+      summary: Add a new schema
+      description: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Schema'
+      responses:
+        '200':
+          description: Schema hashlink
+    get:
+      tags:
+        - schemas
+      summary: Find schemas
+      parameters:
+        - name: q
+          in: query
+          required: false
+          description: Search in all schema fields
+          schema:
+            type: string
+        - name: params
+          in: query
+          required: false
+          description: Search specified schema fields
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    hashlink:
+                      type: string
+                    schema:
+                      $ref: '#/components/schemas/Schema'
+  '/schemas/{hashlink}':
+    get:
+      tags:
+        - schemas
+      summary: Find schema by hashlink
+      parameters:
+        - name: hashlink
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schema'
+components:
+  schemas:
+    Schema:
+      properties:
+        '@context':
+          type: string
+          example: 'https://odca.tech/v1'
+        name:
+          type: string
+        type:
+          type: string
+          example: spec/schema_base/1.0
+        description:
+          type: string
+        classification:
+          type: string
+        issued_by:
+          type: string
+        attributes:
+          type: object
+          properties:
+            attr1:
+              type: string
+            attr2:
+              type: string
+        pii_attributes:
+          type: array
+          items:
+            type: string
+            example: attr1

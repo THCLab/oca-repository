@@ -13,28 +13,28 @@ class Web < Roda
   route do |r|
     es = Stretcher::Server.new('http://es01:9200')
 
-    r.on 'schemas' do
-      r.get String do |id|
-        service = Schemas::Services::GetSchemaService.new(es)
-        service.call(id)
-      end
-
-      r.get do
-        service = Schemas::Services::SearchSchemasService.new(es)
-        service.call(r.params)
-      end
-
-      r.post do
-        service = Schemas::Services::NewSchemaService.new(es)
-        schema = r.params
-
-        hashlink = Schemas::HashlinkGenerator.call(schema)
-        service.call(hashlink: hashlink, schema: schema)
-        hashlink
-      end
-    end
-
     r.on 'api' do
+      r.on 'schemas' do
+        r.get String do |id|
+          service = Schemas::Services::GetSchemaService.new(es)
+          service.call(id)
+        end
+
+        r.get do
+          service = Schemas::Services::SearchSchemasService.new(es)
+          service.call(r.params)
+        end
+
+        r.post do
+          service = Schemas::Services::NewSchemaService.new(es)
+          schema = r.params
+
+          hashlink = Schemas::HashlinkGenerator.call(schema)
+          service.call(hashlink: hashlink, schema: schema)
+          hashlink
+        end
+      end
+
       r.on 'v2' do
         r.on 'schemas' do
           r.on String do |namespace|
