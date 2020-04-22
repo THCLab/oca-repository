@@ -9,6 +9,6 @@ RUN gem install bundler && bundle install
 COPY config/ ./config
 COPY lib/ ./lib
 COPY plugins/ ./plugins
-COPY config.ru web.rb README.md swagger.json ./
+COPY config.ru web.rb README.md ./
 
 EXPOSE 9292

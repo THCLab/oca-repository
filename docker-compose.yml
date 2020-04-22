@@ -1,8 +1,8 @@
 version: '3'
 services:
   odca_search_engine:
-    image: humancolossus/oca-repository:version-0.2.1
-    container_name: ocarepository
+    image: humancolossus/oca-repository:version-0.2.4
+    container_name: oca-repository
     build: ./
     command: /bin/bash -c " bundle exec rackup -o 0.0.0.0"
     ports:
@@ -26,9 +26,10 @@ services:
   swagger:
     image: swaggerapi/swagger-ui
     environment:
-      - SWAGGER_JSON=/swagger.json
+      - SWAGGER_JSON=/openapi-2.0.0.yml
     volumes:
-      - ./swagger.json:/swagger.json
+      - ./openapi-1.0.0.yml:/usr/share/nginx/html/openapi-1.0.0.yml
+      - ./openapi-2.0.0.yml:/openapi-2.0.0.yml
     networks:
       - odca
     ports:
