@@ -3,7 +3,6 @@ services:
   odca_search_engine:
     image: humancolossus/oca-repository:version-0.2.4
     container_name: oca-repository
-    build: ./
     command: /bin/bash -c " bundle exec rackup -o 0.0.0.0"
     ports:
       - 9292:9292
