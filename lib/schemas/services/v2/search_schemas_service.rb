@@ -11,9 +11,14 @@ module Schemas
         end
 
         def call(params)
-          results = search(params)
+          results = if params['suggest']
+                      search_by_suggestion(params['suggest'])
+                        .raw_plain['suggest']['suggestion'].first['options']
+                    else
+                      search(params).raw_plain['hits']['hits']
+                    end
 
-          results.raw_plain['hits']['hits'].map do |r|
+          results.map do |r|
             {
               namespace: r['_source']['namespace'],
               DRI: r['_source']['DRI'] || r['_id'],
@@ -22,6 +27,19 @@ module Schemas
           end
         rescue
           []
+        end
+
+        private def search_by_suggestion(suggestion)
+          suggest = {
+            suggestion: {
+              prefix: suggestion,
+              completion: {
+                field: 'name-suggest'
+              }
+            }
+          }
+          es.index(:schema_base)
+            .search(size: 10, suggest: suggest)
         end
 
         private def search(params)
