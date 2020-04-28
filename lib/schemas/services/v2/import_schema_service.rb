@@ -45,18 +45,29 @@ module Schemas
 
         private def store_zip(namespace, file)
           schema = extract_zip(file)
-          %i[schema_base overlay].each do |index|
-            es.index(index).bulk_index(
-              schema[index].map do |hashlink, content|
-                {
-                  _id: namespace + '/' + hashlink,
-                  namespace: namespace,
-                  DRI: hashlink,
-                  data: content
-                }
-              end
-            )
-          end
+
+          es.index(:schema_base).bulk_index(
+            schema[:schema_base].map do |hashlink, content|
+              {
+                _id: namespace + '/' + hashlink,
+                namespace: namespace,
+                DRI: hashlink,
+                data: content,
+                'name-suggest' => content['name']
+              }
+            end
+          )
+          es.index(:overlay).bulk_index(
+            schema[:overlay].map do |hashlink, content|
+              {
+                _id: namespace + '/' + hashlink,
+                namespace: namespace,
+                DRI: hashlink,
+                data: content
+              }
+            end
+          )
+
           branch = {
             schema_base: schema[:schema_base].keys.first,
             overlays: schema[:overlay].keys.sort
