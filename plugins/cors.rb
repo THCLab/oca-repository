@@ -12,6 +12,7 @@ class Roda
             }, ['']]
           else
             response['Access-Control-Allow-Origin'] = '*'
+            response['Access-Control-Expose-Headers'] = '*'
             super
           end
         end

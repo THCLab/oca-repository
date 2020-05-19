@@ -140,6 +140,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Schema'
+  '/schemas/{namespace}/{DRI}/archive':
+    get:
+      tags:
+        - schemas
+      summary: Download schema archive
+      parameters:
+        - name: namespace
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: DRI
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
 components:
   schemas:
     Schema:
