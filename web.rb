@@ -3,14 +3,12 @@
 require 'roda'
 require 'stretcher'
 require 'json'
-require 'plugins/cors'
 require 'plugins/json_header'
 
 class Web < Roda
   plugin :json
   plugin :json_parser
   plugin :json_header
-  plugin :cors
 
   route do |r|
     es = Stretcher::Server.new('http://es01:9200')
