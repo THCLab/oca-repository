@@ -1,14 +1,14 @@
+# frozen_string_literal: true
+
 require 'roda'
 require 'stretcher'
 require 'json'
-require 'plugins/cors'
 require 'plugins/json_header'
 
 class Web < Roda
   plugin :json
   plugin :json_parser
   plugin :json_header
-  plugin :cors
 
   route do |r|
     es = Stretcher::Server.new('http://es01:9200')
@@ -38,9 +38,25 @@ class Web < Roda
       r.on 'v2' do
         r.on 'schemas' do
           r.on String do |namespace|
-            r.get String do |dri|
-              service = Schemas::Services::V2::GetSchemaService.new(es)
-              service.call(namespace + '/' + dri)
+            r.on String do |dri|
+              r.on 'archive' do
+                r.get do
+                  service = Schemas::Services::V2::GenerateArchiveService.new(
+                    Schemas::Services::V2::GetSchemaService.new(es),
+                    Schemas::HashlinkGenerator
+                  )
+                  filename, data = service.call(namespace: namespace, dri: dri)
+
+                  response.headers['Content-Disposition'] =
+                    "attachment; filename=\"#{filename}\""
+                  data
+                end
+              end
+
+              r.get do
+                service = Schemas::Services::V2::GetSchemaService.new(es)
+                service.call(namespace + '/' + dri)
+              end
             end
 
             r.get do

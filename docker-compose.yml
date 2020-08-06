@@ -1,7 +1,7 @@
 version: '3'
 services:
   odca_search_engine:
-    image: humancolossus/oca-repository:version-0.2.4
+    image: humancolossus/oca-repository:version-0.2.6
     container_name: oca-repository
     command: /bin/bash -c " bundle exec rackup -o 0.0.0.0"
     ports:
