@@ -53,7 +53,7 @@ module Schemas
                 namespace: namespace,
                 DRI: hashlink,
                 data: content,
-                'name-suggest' => content['name']
+                'name-suggest' => [namespace, content['name']]
               }
             end
           )
