@@ -55,7 +55,7 @@ class Web < Roda
 
               r.get do
                 service = Schemas::Services::V2::GetSchemaService.new(es)
-                service.call(namespace + '/' + dri)
+                service.call(namespace: namespace, dri: dri)
               end
             end
 
@@ -68,12 +68,22 @@ class Web < Roda
               service = Schemas::Services::V2::ImportSchemaService.new(
                 es, ::Schemas::HashlinkGenerator
               )
-              dri = service.call(namespace, r.params)
+              begin
+                dri = service.call(namespace, r.params)
 
-              {
-                DRI: dri,
-                url: "#{r.base_url}/api/v2/schemas/#{namespace}/#{dri}"
-              }
+                {
+                  success: true,
+                  DRI: dri,
+                  url: "#{r.base_url}/api/v2/schemas/#{namespace}/#{dri}"
+                }
+              rescue StandardError => e
+                puts e.backtrace
+                {
+                  success: false,
+                  errors: [e.message],
+                  url: "#{r.base_url}/api/v2/schemas"
+                }
+              end
             end
           end
 
