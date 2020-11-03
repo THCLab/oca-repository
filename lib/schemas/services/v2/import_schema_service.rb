@@ -14,12 +14,16 @@ module Schemas
         end
 
         def call(namespace, raw_params)
+          raise "Namespace '_any' is forbidden" if namespace == '_any'
+
           params = validate(raw_params)
           type = params[:file][:filename].split('.').last
           if type == 'json'
             store_json(namespace, params[:file][:tempfile])
           elsif type == 'zip'
             store_zip(namespace, params[:file][:tempfile])
+          else
+            raise 'File type must be json or zip'
           end
         end
 
