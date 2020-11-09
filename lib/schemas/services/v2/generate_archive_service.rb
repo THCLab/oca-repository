@@ -14,7 +14,7 @@ module Schemas
         end
 
         def call(namespace:, dri:)
-          schema = get_schema_service.call(namespace + '/' + dri)
+          schema = get_schema_service.call(namespace: namespace, dri: dri)
           if schema[:overlays]
             filename = dri + '.zip'
             data = pack_to_zip(schema)
