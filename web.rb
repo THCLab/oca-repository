@@ -93,6 +93,45 @@ class Web < Roda
           end
         end
       end
+
+      r.on 'v3' do
+        r.on 'namespaces' do
+          r.on String do |namespace|
+            r.on 'schemas' do
+              r.get do
+                [{ name: 'schema1' }, { name: 'schema2' }]
+              end
+
+              r.post do
+                'SEND SCHEMA'
+              end
+            end
+          end
+
+          r.get do
+            # TODO
+            []
+          end
+        end
+
+        r.on 'schemas' do
+          r.on String do |dri|
+            r.on 'archive' do
+              r.get do
+                'ARCHIVE'
+              end
+            end
+
+            r.get do
+              { name: 'schema1' }
+            end
+          end
+
+          r.get do
+            [{ name: 'schema1' }, { name: 'schema2' }]
+          end
+        end
+      end
     end
   end
 end
