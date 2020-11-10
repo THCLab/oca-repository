@@ -103,7 +103,30 @@ class Web < Roda
               end
 
               r.post do
-                'SEND SCHEMA'
+                service = ::Schemas::Services::V3::ImportSchemaService.new(
+                  ::Schemas::Repositories::SchemaBaseRepo.new(
+                    es, ::Schemas::HashlinkGenerator
+                  ),
+                  ::Schemas::Repositories::BranchRepo.new(
+                    es, ::Schemas::HashlinkGenerator
+                  )
+                )
+                begin
+                  dri = service.call(namespace, r.params)
+
+                  {
+                    success: true,
+                    DRI: dri,
+                    path: "#{r.base_url}/api/v3/schemas/#{dri}"
+                  }
+                rescue StandardError => e
+                  puts e.backtrace
+                  {
+                    success: false,
+                    errors: [e.message],
+                    path: "#{r.base_url}/api/v3/schemas"
+                  }
+                end
               end
             end
           end
