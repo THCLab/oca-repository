@@ -99,7 +99,11 @@ class Web < Roda
           r.on String do |namespace|
             r.on 'schemas' do
               r.get do
-                [{ name: 'schema1' }, { name: 'schema2' }]
+                schema_read_repo = ::Schemas::Repositories::SchemaReadRepo.new(es)
+                service = Schemas::Services::V3::SearchSchemasService.new(
+                  schema_read_repo
+                )
+                service.call(r.params.merge('namespace' => namespace))
               end
 
               r.post do
