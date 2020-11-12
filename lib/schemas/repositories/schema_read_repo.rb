@@ -21,6 +21,43 @@ module Schemas
         resolve_branch(record)
       end
 
+      def search(namespace:, query:, type:, limit: 1000)
+        must = []
+        must << { match: { 'namespace' => namespace } } if namespace
+        must << { multi_match: { query: query, fields: ['data.*'] } } if query
+        must << { match: { 'data.type' => type } } if type
+
+        q = must.empty? ? { match_all: {} } : { bool: { must: must } }
+
+        results = es.index(:_all)
+          .search(size: limit, query: q)
+          .raw_plain['hits']['hits']
+
+        unique_results = results.uniq { |r| r['_source']['DRI'] }
+        unique_results.map do |r|
+          { DRI: r['_source']['DRI'], schema: r['_source']['data'] }
+        end
+      end
+
+      def search_by_suggestion(suggestion, limit: 10)
+        suggest = {
+          suggestion: {
+            prefix: suggestion,
+            completion: {
+              field: 'name-suggest'
+            }
+          }
+        }
+        results = es.index(:schema_base)
+          .search(size: limit, suggest: suggest)
+          .raw_plain['suggest']['suggestion'].first['options']
+
+        unique_results = results.uniq { |r| r['_source']['DRI'] }
+        unique_results.map do |r|
+          { DRI: r['_source']['DRI'], schema: r['_source']['data'] }
+        end
+      end
+
       private def resolve_branch(record)
         namespace = record[:_source][:namespace]
         branch = record[:_source][:data]
