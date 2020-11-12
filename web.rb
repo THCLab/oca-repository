@@ -147,7 +147,11 @@ class Web < Roda
             end
 
             r.get do
-              { name: 'schema1' }
+              schema_read_repo = ::Schemas::Repositories::SchemaReadRepo.new(es)
+              service = Schemas::Services::V3::GetSchemaService.new(
+                schema_read_repo
+              )
+              service.call(dri)
             end
           end
 
