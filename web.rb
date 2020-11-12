@@ -146,7 +146,16 @@ class Web < Roda
           r.on String do |dri|
             r.on 'archive' do
               r.get do
-                'ARCHIVE'
+                schema_read_repo = ::Schemas::Repositories::SchemaReadRepo.new(es)
+                service = Schemas::Services::V3::GenerateArchiveService.new(
+                  Schemas::Services::V3::GetSchemaService.new(schema_read_repo),
+                  Schemas::HashlinkGenerator
+                )
+                filename, data = service.call(dri)
+
+                response.headers['Content-Disposition'] =
+                  "attachment; filename=\"#{filename}\""
+                data
               end
             end
 
