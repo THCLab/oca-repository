@@ -6,16 +6,16 @@ module Schemas
   module Services
     module V3
       class ImportBranchService
-        attr_reader :branch_repo
+        attr_reader :schema_repo
 
-        def initialize(branch_repo)
-          @branch_repo = branch_repo
+        def initialize(schema_repo)
+          @schema_repo = schema_repo
         end
 
         def call(namespace, file)
-          branch = extract_zip(file)
-          saved_branch = branch_repo.save(namespace: namespace, branch: branch)
-          saved_branch[:DRI]
+          schema = extract_zip(file)
+          saved_schema = schema_repo.save(namespace: namespace, schema: schema)
+          saved_schema[:DRI]
         end
 
         private def extract_zip(file)

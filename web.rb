@@ -103,17 +103,14 @@ class Web < Roda
               end
 
               r.post do
-                schema_base_repo = ::Schemas::Repositories::SchemaBaseRepo.new(
+                schema_write_repo = ::Schemas::Repositories::SchemaWriteRepo.new(
                   es, ::Schemas::HashlinkGenerator
-                )
-                branch_repo = ::Schemas::Repositories::BranchRepo.new(
-                  es, ::Schemas::HashlinkGenerator, schema_base_repo
                 )
                 service = ::Schemas::Services::V3::ImportSchemaService.new(
                   ::Schemas::Services::V3::ImportSchemaBaseService.new(
-                    schema_base_repo
+                    schema_write_repo
                   ),
-                  ::Schemas::Services::V3::ImportBranchService.new(branch_repo)
+                  ::Schemas::Services::V3::ImportBranchService.new(schema_write_repo)
                 )
                 begin
                   dri = service.call(namespace, r.params)

@@ -6,16 +6,17 @@ module Schemas
   module Services
     module V3
       class ImportSchemaBaseService
-        attr_reader :schema_base_repo
+        attr_reader :schema_repo
 
-        def initialize(schema_base_repo)
-          @schema_base_repo = schema_base_repo
+        def initialize(schema_repo)
+          @schema_repo = schema_repo
         end
 
         def call(namespace, file)
           schema_base = JSON.parse(file.read)
-          saved_schema_base = schema_base_repo.save(
-            namespace: namespace, schema_base: schema_base
+          schema = { schema_base: schema_base }
+          saved_schema_base = schema_repo.save(
+            namespace: namespace, schema: schema
           )
           saved_schema_base[:DRI]
         end
