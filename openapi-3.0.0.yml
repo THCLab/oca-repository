@@ -1,0 +1,221 @@
+openapi: 3.0.0
+info:
+  description: ''
+  version: 3.0.0
+  title: OCA Repository
+servers:
+  - url: 'http://localhost:9292/api/v3'
+tags:
+  - name: namespaces
+  - name: schemas
+paths:
+  '/namespaces/{namespace}/schemas':
+    get:
+      tags:
+        - namespaces
+      summary: Fetch OCA Schemas in given namespace
+      parameters:
+        - name: namespace
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: suggest
+          in: query
+          required: false
+          description: List all schemas which namespace or name starts with given string (when provided rest of params are ignored)
+          schema:
+            type: string
+        - name: q
+          in: query
+          required: false
+          description: Search given string in all schema fields
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          description: Search in selected type (ex. 'schema_base' / 'overlay' / 'label' / 'entry' / ...)
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Max number of results (default 1000)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/Record'
+    post:
+      tags:
+        - namespaces
+      summary: Add OCA Schema by JSON or ZIP file to specified namespace
+      parameters:
+        - name: namespace
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Select JSON file to upload schema base or ZIP file to upload schema branch
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  DRI:
+                    type: string
+                  path:
+                    type: string
+
+  '/schemas':
+    get:
+      tags:
+        - schemas
+      summary: Fetch OCA Schemas
+      parameters:
+        - name: suggest
+          in: query
+          required: false
+          description: List all schemas which namespace or name starts with given string (when provided rest of params are ignored)
+          schema:
+            type: string
+        - name: namespace
+          in: query
+          required: false
+          description: Filter search to given namespace (same as /namespaces/{namespace}/schemas endpoint)
+          schema:
+            type: string
+        - name: q
+          in: query
+          required: false
+          description: Search given string in all schema fields
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          description: Search in selected type (ex. 'schema_base' / 'overlay' / 'label' / 'entry' / ...)
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Max number of results (default 1000)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/Record'
+
+  '/schemas/{DRI}':
+    get:
+      tags:
+        - schemas
+      summary: Fetch OCA Schema by DRI
+      parameters:
+        - name: DRI
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Schema'
+                  - $ref: '#/components/schemas/SchemaBase'
+
+  '/schemas/{DRI}/archive':
+    get:
+      tags:
+        - schemas
+      summary: Download OCA Schema archive
+      parameters:
+        - name: DRI
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+
+components:
+  schemas:
+    Record:
+      properties:
+        DRI:
+          type: string
+        schema:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/SchemaBase'
+    SchemaBase:
+      properties:
+        '@context':
+          type: string
+          example: 'https://odca.tech/v1'
+        name:
+          type: string
+        type:
+          type: string
+          example: spec/schema_base/1.0
+        description:
+          type: string
+        classification:
+          type: string
+        issued_by:
+          type: string
+        attributes:
+          type: object
+          properties:
+            attr1:
+              type: string
+            attr2:
+              type: string
+        pii_attributes:
+          type: array
+          items:
+            type: string
+            example: attr1
+    Schema:
+      properties:
+        schema_base:
+          type: object
+          $ref: "#/components/schemas/SchemaBase"
+        overlays:
+          type: array
+          items:
+            type: object

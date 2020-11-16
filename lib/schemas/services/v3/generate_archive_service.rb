@@ -4,7 +4,7 @@ require 'zip'
 
 module Schemas
   module Services
-    module V2
+    module V3
       class GenerateArchiveService
         attr_reader :get_schema_service, :hashlink_generator
 
@@ -13,8 +13,8 @@ module Schemas
           @hashlink_generator = hashlink_generator
         end
 
-        def call(namespace:, dri:)
-          schema = get_schema_service.call(namespace: namespace, dri: dri)
+        def call(dri)
+          schema = get_schema_service.call(dri)
           if schema[:overlays]
             filename = dri + '.zip'
             data = pack_to_zip(schema)
