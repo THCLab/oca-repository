@@ -4,6 +4,7 @@ require 'stretcher'
 Dir["#{LIB_PATH}/schemas/*.rb"].each { |file| require file }
 Dir["#{LIB_PATH}/schemas/repositories/*.rb"].each { |file| require file }
 Dir["#{LIB_PATH}/schemas/services/*.rb"].each { |file| require file }
+Dir["#{LIB_PATH}/schemas/services/v1/*.rb"].each { |file| require file }
 Dir["#{LIB_PATH}/schemas/services/v2/*.rb"].each { |file| require file }
 Dir["#{LIB_PATH}/schemas/services/v3/*.rb"].each { |file| require file }
 

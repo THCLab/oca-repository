@@ -16,17 +16,17 @@ class Web < Roda
     r.on 'api' do
       r.on 'schemas' do
         r.get String do |id|
-          service = Schemas::Services::GetSchemaService.new(es)
+          service = Schemas::Services::V1::GetSchemaService.new(es)
           service.call(id)
         end
 
         r.get do
-          service = Schemas::Services::SearchSchemasService.new(es)
+          service = Schemas::Services::V1::SearchSchemasService.new(es)
           service.call(r.params)
         end
 
         r.post do
-          service = Schemas::Services::NewSchemaService.new(es)
+          service = Schemas::Services::V1::NewSchemaService.new(es)
           schema = r.params
 
           hashlink = Schemas::HashlinkGenerator.call(schema)
