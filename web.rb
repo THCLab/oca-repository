@@ -99,7 +99,7 @@ class Web < Roda
           r.on String do |namespace|
             r.on 'schemas' do
               r.get do
-                schema_read_repo = ::Schemas::Repositories::SchemaReadRepo.new(es)
+                schema_read_repo = ::Schemas::Repositories::V3::SchemaReadRepo.new(es)
                 service = Schemas::Services::V3::SearchSchemasService.new(
                   schema_read_repo
                 )
@@ -107,7 +107,7 @@ class Web < Roda
               end
 
               r.post do
-                schema_write_repo = ::Schemas::Repositories::SchemaWriteRepo.new(
+                schema_write_repo = ::Schemas::Repositories::V3::SchemaWriteRepo.new(
                   es, ::Schemas::HashlinkGenerator
                 )
                 service = ::Schemas::Services::V3::ImportSchemaService.new(
@@ -146,7 +146,7 @@ class Web < Roda
           r.on String do |dri|
             r.on 'archive' do
               r.get do
-                schema_read_repo = ::Schemas::Repositories::SchemaReadRepo.new(es)
+                schema_read_repo = ::Schemas::Repositories::V3::SchemaReadRepo.new(es)
                 service = Schemas::Services::V3::GenerateArchiveService.new(
                   Schemas::Services::V3::GetSchemaService.new(schema_read_repo),
                   Schemas::HashlinkGenerator
@@ -160,7 +160,7 @@ class Web < Roda
             end
 
             r.get do
-              schema_read_repo = ::Schemas::Repositories::SchemaReadRepo.new(es)
+              schema_read_repo = ::Schemas::Repositories::V3::SchemaReadRepo.new(es)
               service = Schemas::Services::V3::GetSchemaService.new(
                 schema_read_repo
               )
@@ -169,7 +169,7 @@ class Web < Roda
           end
 
           r.get do
-            schema_read_repo = ::Schemas::Repositories::SchemaReadRepo.new(es)
+            schema_read_repo = ::Schemas::Repositories::V3::SchemaReadRepo.new(es)
             service = Schemas::Services::V3::SearchSchemasService.new(
               schema_read_repo
             )
