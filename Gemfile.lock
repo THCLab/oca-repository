@@ -13,7 +13,7 @@ GEM
     hashie (4.0.0)
     multi_json (1.14.1)
     multipart-post (1.2.0)
-    rack (2.1.1)
+    rack (2.2.3)
     roda (3.28.0)
       rack
     rubyzip (2.2.0)
