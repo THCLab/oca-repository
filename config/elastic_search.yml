@@ -8,6 +8,11 @@ schema_base:
     mapping:
       total_fields:
         limit: 10000
+capture_base:
+  index:
+    mapping:
+      total_fields:
+        limit: 10000
 overlay:
   index:
     mapping:

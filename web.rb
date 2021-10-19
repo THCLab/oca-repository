@@ -177,6 +177,90 @@ class Web < Roda
           end
         end
       end
+
+      r.on 'v4' do
+        r.on 'namespaces' do
+          r.on String do |namespace|
+            r.on 'schemas' do
+              r.get do
+                schema_read_repo = ::Schemas::Repositories::V4::SchemaReadRepo.new(es)
+                service = Schemas::Services::V4::SearchSchemasService.new(
+                  schema_read_repo
+                )
+                service.call(r.params.merge('namespace' => namespace))
+              end
+
+              r.post do
+                schema_write_repo = ::Schemas::Repositories::V4::SchemaWriteRepo.new(
+                  es, ::Schemas::SaiGenerator
+                )
+                service = ::Schemas::Services::V4::ImportSchemaService.new(
+                  ::Schemas::Services::V4::ImportSchemaBaseService.new(
+                    schema_write_repo
+                  ),
+                  ::Schemas::Services::V4::ImportBranchService.new(schema_write_repo)
+                )
+                begin
+                  sai = service.call(namespace, r.params)
+
+                  {
+                    success: true,
+                    SAI: sai,
+                    path: "#{r.base_url}/api/v4/schemas/#{sai}"
+                  }
+                rescue StandardError => e
+                  puts e.backtrace
+                  {
+                    success: false,
+                    errors: [e.message],
+                    path: "#{r.base_url}/api/v4/schemas"
+                  }
+                end
+              end
+            end
+          end
+
+          r.get do
+            # TODO
+            []
+          end
+        end
+
+        r.on 'schemas' do
+          r.on String do |sai|
+            r.on 'archive' do
+              r.get do
+                schema_read_repo = ::Schemas::Repositories::V4::SchemaReadRepo.new(es)
+                service = Schemas::Services::V4::GenerateArchiveService.new(
+                  Schemas::Services::V4::GetSchemaService.new(schema_read_repo),
+                  Schemas::SaiGenerator
+                )
+                filename, data = service.call(sai)
+
+                response.headers['Content-Disposition'] =
+                  "attachment; filename=\"#{filename}\""
+                data
+              end
+            end
+
+            r.get do
+              schema_read_repo = ::Schemas::Repositories::V4::SchemaReadRepo.new(es)
+              service = Schemas::Services::V4::GetSchemaService.new(
+                schema_read_repo
+              )
+              service.call(sai)
+            end
+          end
+
+          r.get do
+            schema_read_repo = ::Schemas::Repositories::V4::SchemaReadRepo.new(es)
+            service = Schemas::Services::V4::SearchSchemasService.new(
+              schema_read_repo
+            )
+            service.call(r.params)
+          end
+        end
+      end
     end
   end
 end

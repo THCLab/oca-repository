@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     base58 (0.2.3)
+    digest-blake3 (0.37.0.1)
     excon (0.71.1)
     faraday (0.8.9)
       multipart-post (~> 1.2.0)
@@ -30,6 +31,7 @@ PLATFORMS
 
 DEPENDENCIES
   base58 (~> 0.2)
+  digest-blake3
   faraday (= 0.8.9)
   roda (~> 3.22)
   rubyzip (~> 2.2)
