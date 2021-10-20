@@ -33,8 +33,7 @@ module Schemas
             _id: namespace + '/' + hashlink,
             namespace: namespace,
             SAI: hashlink,
-            data: capture_base,
-            'name-suggest' => [namespace, '_caputure_base_name']
+            data: capture_base
           }
           es.index(:capture_base).bulk_index([record])
           record
@@ -58,12 +57,16 @@ module Schemas
             capture_base: capture_base.fetch(:SAI),
             overlays: overlays.map { |o| o.fetch(:SAI) }.sort
           }
+          meta_overlays = overlays.select { |o| o.fetch(:data).fetch("type").include? "/meta/" }
+          branch_names = meta_overlays.map { |o| o.fetch(:data).fetch("name") }.reject(&:empty?)
+
           hashlink = hashlink_generator.call(branch)
           record = {
             _id: namespace + '/' + hashlink,
             namespace: namespace,
             SAI: hashlink,
-            data: branch
+            data: branch,
+            'name-suggest' => [namespace] + branch_names
           }
           es.index(:branch).bulk_index([record])
           record

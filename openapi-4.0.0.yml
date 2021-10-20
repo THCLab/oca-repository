@@ -176,11 +176,22 @@ components:
   schemas:
     Record:
       properties:
+        matching:
+          type: string
+          required: false
+          description: Matching Schema name. Only when searching with suggest param.
+        names:
+          type: string
+          required: false
+          description: Only if record is Schema branch
+        namespace:
+          type: string
         SAI:
           type: string
         schema:
           type: object
           oneOf:
+            - $ref: '#/components/schemas/Schema'
             - $ref: '#/components/schemas/CaptureBase'
     CaptureBase:
       properties:

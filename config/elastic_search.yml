@@ -18,3 +18,11 @@ overlay:
     mapping:
       total_fields:
         limit: 10000
+branch:
+  index:
+    mapping:
+      total_fields:
+        limit: 10000
+      properties:
+        name-suggest:
+          type: "completion"

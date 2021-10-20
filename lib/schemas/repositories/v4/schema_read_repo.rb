@@ -34,9 +34,24 @@ module Schemas
             .search(size: limit, query: q)
             .raw_plain['hits']['hits']
 
-          unique_results = results.uniq { |r| r['_source']['SAI'] }
+          results = symbolize_keys(results)
+
+          unique_results = results.uniq { |r| r[:_source][:SAI] }
           unique_results.map do |r|
-            { SAI: r['_source']['SAI'], schema: r['_source']['data'] }
+            if r[:_index] == 'branch'
+              {
+                names: r[:_source][:"name-suggest"].drop(1),
+                SAI: r[:_source][:SAI],
+                namespace: r[:_source][:namespace],
+                schema: resolve_branch(r)
+              }
+            else
+              {
+                SAI: r[:_source][:SAI],
+                namespace: r[:_source][:namespace],
+                schema: r[:_source][:data]
+              }
+            end
           end
         end
 
@@ -49,13 +64,21 @@ module Schemas
               }
             }
           }
-          results = es.index(:capture_base)
+          results = es.index(:branch)
             .search(size: limit, suggest: suggest)
             .raw_plain['suggest']['suggestion'].first['options']
 
-          unique_results = results.uniq { |r| r['_source']['SAI'] }
+          results = symbolize_keys(results)
+
+          unique_results = results.uniq { |r| r[:_source][:SAI] }
           unique_results.map do |r|
-            { SAI: r['_source']['SAI'], schema: r['_source']['data'] }
+            {
+              matching: r[:text],
+              names: r[:_source][:"name-suggest"].drop(1),
+              namespace: r[:_source][:namespace],
+              SAI: r[:_source][:SAI],
+              schema: resolve_branch(r)
+            }
           end
         end
 
@@ -85,6 +108,18 @@ module Schemas
           end.flatten
           es.mget(docs, exists: nil)
             .select { |r| r[:found] == true }
+        end
+
+        private def symbolize_keys(obj)
+          return obj.reduce({}) do |memo, (k, v)|
+            memo.tap { |m| m[k.to_sym] = symbolize_keys(v) }
+          end if obj.is_a? Hash
+
+          return obj.reduce([]) do |memo, v|
+            memo << symbolize_keys(v); memo
+          end if obj.is_a? Array
+
+          obj
         end
       end
     end
