@@ -1,25 +1,26 @@
-odca:
-  index:
-    mapping:
-      total_fields:
-        limit: 10000
-schema_base:
-  index:
-    mapping:
-      total_fields:
-        limit: 10000
 capture_base:
-  index:
-    mapping:
-      total_fields:
-        limit: 10000
-overlay:
-  index:
-    mapping:
-      total_fields:
-        limit: 10000
-branch:
-  index:
-    mapping:
-      total_fields:
-        limit: 10000
+  mappings:
+    properties:
+      capture_base_sai:
+        type: text
+        index: false
+      namespace:
+        type: search_as_you_type
+      attributes:
+        type: search_as_you_type
+      flagged_attributes:
+        type: search_as_you_type
+meta:
+  mappings:
+    properties:
+      capture_base_sai:
+        type: text
+        index: false
+      suggest:
+        type: completion
+      namespace:
+        type: search_as_you_type
+      name:
+        type: search_as_you_type
+      description:
+        type: search_as_you_type

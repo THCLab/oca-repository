@@ -1,20 +1,24 @@
 version: '3'
 services:
   odca_search_engine:
-    image: humancolossus/oca-repository:version-0.2.11
+    image: humancolossus/oca-repository:0.3.0
     container_name: oca-repository
-    command: /bin/bash -c " bundle exec rackup -o 0.0.0.0"
+    command: /bin/sh -c "bundle exec rackup -o 0.0.0.0"
+    environment:
+      - BASE_URL=http://localhost:9292
+      - ES_URL=http://es01:9200
     ports:
       - 9292:9292
     networks:
       - odca
 
   es01:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
+    image: elasticsearch:8.1.2
     environment:
       - node.name=es01
       - cluster.name=es-docker-cluster
       - discovery.type=single-node
+      - xpack.security.enabled=false
     volumes:
       - data01:/usr/share/elasticsearch/data
     networks:

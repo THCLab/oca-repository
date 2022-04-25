@@ -1,22 +1,29 @@
-require 'yaml'
-require 'stretcher'
+# frozen_string_literal: true
 
+require 'yaml'
+require 'elasticsearch'
+
+raise 'Please provide ES_URL environment variable.' unless ENV['ES_URL']
+
+ES_URL = URI(ENV['ES_URL']).normalize.to_s
+STORAGE_PATH = File.join(ROOT_PATH, 'storage')
 
 es_config = YAML.load_file("#{ROOT_PATH}/config/elastic_search.yml")
-es = Stretcher::Server.new('http://es01:9200')
-es_updated = false
+es = Elasticsearch::Client.new(host: ES_URL)
+indexes_updated = 0
 
-until es_updated
+until indexes_updated >= es_config.size
   begin
-    es_config.each do |index, settings|
-      es.index(index).update_settings(settings)
+    es.cluster.health
+    es_config.each do |index, config|
+      indexes_updated += 1
+      next if es.indices.exists?(index: index)
+
+      es.indices.create(index: index, body: config)
     end
-    es_updated = true
-  rescue Faraday::Error::ConnectionFailed
-    sleep 1
-  rescue Faraday::Error::TimeoutError
-    sleep 1
-  rescue Stretcher::RequestError::NotFound => e
-    es.index(e.http_response.env[:body]['error']['index']).create
+  rescue Faraday::ConnectionFailed
+    sleep 10
+  rescue Faraday::TimeoutError
+    sleep 10
   end
 end
