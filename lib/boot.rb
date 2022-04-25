@@ -3,6 +3,16 @@
 require 'yaml'
 require 'elasticsearch'
 
+Dir["#{LIB_PATH}/common/*.rb"].sort.each { |file| require file }
+
+Dir["#{LIB_PATH}/v0_1/*.rb"].sort.each { |file| require file }
+Dir["#{LIB_PATH}/v0_1/oca/*.rb"].sort.each { |file| require file }
+Dir["#{LIB_PATH}/v0_1/oca/repositories/*.rb"].sort.each { |file| require file }
+Dir["#{LIB_PATH}/v0_1/oca/services/*.rb"].sort.each { |file| require file }
+Dir["#{LIB_PATH}/v0_1/transformations/*.rb"].sort.each { |file| require file }
+Dir["#{LIB_PATH}/v0_1/transformations/units/*.rb"].sort.each { |file| require file }
+Dir["#{LIB_PATH}/v0_1/transformations/units/services/*.rb"].sort.each { |file| require file }
+
 raise 'Please provide ES_URL environment variable.' unless ENV['ES_URL']
 
 ES_URL = URI(ENV['ES_URL']).normalize.to_s
