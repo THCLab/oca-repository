@@ -29,12 +29,9 @@ services:
   swagger:
     image: swaggerapi/swagger-ui
     environment:
-      - SWAGGER_JSON=/openapi-4.0.0.yml
+      - SWAGGER_JSON=/openapi-0.1.yml
     volumes:
-      - ./openapi-1.0.0.yml:/usr/share/nginx/html/openapi-1.0.0.yml
-      - ./openapi-2.0.0.yml:/usr/share/nginx/html/openapi-2.0.0.yml
-      - ./openapi-3.0.0.yml:/usr/share/nginx/html/openapi-3.0.0.yml
-      - ./openapi-4.0.0.yml:/openapi-4.0.0.yml
+      - ./docs/openapi/openapi-0.1.yml:/openapi-0.1.yml
     networks:
       - odca
     ports:

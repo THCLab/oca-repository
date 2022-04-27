@@ -1,0 +1,335 @@
+openapi: 3.0.0
+info:
+  description: ''
+  version: 0.1
+  title: OCA Repository
+servers:
+  - url: 'http://localhost:9292/api/v0.1'
+tags:
+  - name: namespaces
+  - name: search
+  - name: transformations
+paths:
+
+  '/namespaces/{namespace}/schemas':
+    get:
+      tags:
+        - namespaces
+      summary: Fetch all OCA Chunks and OCA Bundles in namespace
+      parameters:
+        - name: namespace
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  anyOf:
+                    - $ref: '#/components/schemas/Bundle'
+                    - $ref: '#/components/schemas/CaptureBase'
+    post:
+      tags:
+        - namespaces
+      summary: Add OCA Chunk or OCA Bundle to namespace
+      parameters:
+        - name: namespace
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Select JSON file to upload OCA Chunk or ZIP file to upload OCA Bundle
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  SAI:
+                    type: string
+                  path:
+                    type: string
+
+  '/namespaces/{namespace}/schemas/{SAI}':
+    get:
+      tags:
+        - namespaces
+      summary: Fetch OCA Chunk or OCA Bundle by SAI in namespace
+      parameters:
+        - name: namespace
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: SAI
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Bundle'
+                  - $ref: '#/components/schemas/CaptureBase'
+  '/namespaces/{namespace}/schemas/{SAI}/bundles':
+    get:
+      tags:
+        - namespaces
+      summary: Fetch list of OCA Bundles' SAIs linked to given Capture Base SAI
+      parameters:
+        - name: namespace
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: SAI
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '404':
+          description: Given SAI is not of Capture Base
+  '/namespaces/{namespace}/schemas/{SAI}/archive':
+    get:
+      tags:
+        - namespaces
+      summary: Download OCA archive
+      parameters:
+        - name: namespace
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: SAI
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+
+  '/search':
+    get:
+      tags:
+        - search
+      summary: Search for OCA records
+      parameters:
+        - name: suggest
+          in: query
+          required: false
+          description: List all OCA Capture Base SAI which namespace or name starts with given string
+          schema:
+            type: string
+        - name: q
+          in: query
+          required: false
+          description: Search given string in all OCA Capture Base fields
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Limit number of returned records
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      type: object
+                      properties:
+                        matching:
+                          type: string
+                        name:
+                          type: string
+                        namespace:
+                          type: string
+                        capture_base_sai:
+                          type: string
+                  - type: array
+                    items:
+                      type: object
+                      properties:
+                        namespace:
+                          type: string
+                        capture_base_sai:
+                          type: string
+              examples:
+                Suggest:
+                  value: [{
+                    matching: 'ipsum',
+                    name: 'Lorem ipsum',
+                    namespace: 'test',
+                    capture_base_sai: 'ETaSNrWxbAg_bUsIWuWtnpE0oip5m6VKgaPGb_aU_uBA'
+                  }]
+                Query:
+                  value: [{
+                    namespace: 'test',
+                    capture_base_sai: 'ETaSNrWxbAg_bUsIWuWtnpE0oip5m6VKgaPGb_aU_uBA'
+                  }]
+
+
+  '/transformations/units':
+    get:
+      tags:
+        - transformations
+      summary: Get operations to transform between source unit and target unit
+      parameters:
+        - in: query
+          name: source
+        - in: query
+          name: target
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                      result:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            op:
+                              type: string
+                              enum: [/+, /-, /*, //]
+                            value:
+                              type: float
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                      error:
+                        type: string
+              examples:
+                Success:
+                  value:
+                    success: true
+                    result: [{
+                      op: '*',
+                      value: 0.1
+                    }]
+                Failure:
+                  value:
+                    success: false
+                    error: "An error occurred"
+    post:
+      tags:
+        - transformations
+      summary: Store record to the needs of unit transformations
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          schema:
+            type: object
+            required:
+              - table
+              - key
+              - value
+            properties:
+              table:
+                type: string
+              key:
+                type: string
+              value:
+                type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                      error:
+                        type: string
+              examples:
+                Success:
+                  value:
+                    success: true
+                Failure:
+                  value:
+                    success: false
+                    error: "An error occurred"
+
+components:
+  schemas:
+    CaptureBase:
+      properties:
+        type:
+          type: string
+          example: spec/capture_base/1.0
+        classification:
+          type: string
+        attributes:
+          type: object
+          properties:
+            attr1:
+              type: string
+            attr2:
+              type: string
+        flagged_attributes:
+          type: array
+          items:
+            type: string
+            example: attr1
+    Bundle:
+      properties:
+        capture_base:
+          type: object
+          $ref: "#/components/schemas/CaptureBase"
+        overlays:
+          type: array
+          items:
+            type: object
