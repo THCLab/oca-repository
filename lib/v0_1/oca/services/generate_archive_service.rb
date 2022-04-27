@@ -15,9 +15,10 @@ module V01
         end
 
         def call(namespace, sai)
+          oca_storage_path = namespace ? "#{STORAGE_PATH}/namespaces/#{namespace}" : "#{STORAGE_PATH}/oca"
           schema = get_schema_service.call(namespace: namespace, sai: sai)
 
-          store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/namespaces/#{namespace}/db/oca")
+          store = Moneta.new(:DBM, file: "#{oca_storage_path}/db/oca")
           type = JSON.parse(store[sai])['type']
           store.close
 

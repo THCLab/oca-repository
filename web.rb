@@ -16,6 +16,44 @@ class Web < Roda
 
     r.on 'api' do
       r.on 'v0.1' do
+        r.on 'schemas' do
+          r.on String do |sai|
+            r.on 'bundles' do
+              service = ::V01::OCA::Services::GetSchemaBundlesService.new
+              service.call(namespace: nil, sai:)
+            end
+
+            r.on 'archive' do
+              schema_read_repo = ::V01::OCA::Repositories::SchemaReadRepo.new(es)
+              service = ::V01::OCA::Services::GenerateArchiveService.new(
+                ::V01::OCA::Services::GetSchemaService.new(schema_read_repo),
+                ::Common::SaiGenerator
+              )
+              filename, data = service.call(nil, sai)
+
+              response.headers['Content-Disposition'] =
+                "attachment; filename=\"#{filename}\""
+              data
+            end
+
+            r.get do
+              schema_read_repo = ::V01::OCA::Repositories::SchemaReadRepo.new(es)
+              service = ::V01::OCA::Services::GetSchemaService.new(
+                schema_read_repo
+              )
+              service.call(namespace: nil, sai:)
+            end
+          end
+
+          r.get do
+            schema_read_repo = ::V01::OCA::Repositories::SchemaReadRepo.new(es)
+            service = ::V01::OCA::Services::GetSchemasService.new(
+              schema_read_repo
+            )
+            service.call(nil)
+          end
+        end
+
         r.on 'namespaces' do
           r.on String do |namespace|
             r.on 'schemas' do

@@ -7,9 +7,10 @@ module V01
     module Services
       class GetSchemaBundlesService
         def call(namespace:, sai:)
-          return [] unless Dir.exists?("#{STORAGE_PATH}/namespaces/#{namespace}")
+          oca_storage_path = namespace ? "#{STORAGE_PATH}/namespaces/#{namespace}" : "#{STORAGE_PATH}/oca"
+          return [] unless Dir.exists?(oca_storage_path)
 
-          bundles_store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/namespaces/#{namespace}/db/cb_bundles")
+          bundles_store = Moneta.new(:DBM, file: "#{oca_storage_path}/db/cb_bundles")
           results = bundles_store[sai]
           bundles_store.close
           results

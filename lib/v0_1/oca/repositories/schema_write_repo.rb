@@ -15,6 +15,7 @@ module V01
 
         def save(namespace:, schema:)
           FileUtils.mkdir_p("#{STORAGE_PATH}/namespaces/#{namespace}/db")
+          FileUtils.mkdir_p("#{STORAGE_PATH}/oca/db")
 
           capture_base_sai = save_capture_base(
             namespace: namespace, capture_base: schema.fetch(:capture_base)
@@ -42,6 +43,17 @@ module V01
         private def save_capture_base(namespace:, capture_base:)
           sai = hashlink_generator.call(capture_base)
 
+          general_store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/oca/db/oca")
+          unless general_store.key?(sai)
+            create_file(
+              path: "#{STORAGE_PATH}/oca",
+              filename: sai,
+              content: capture_base
+            )
+            general_store[sai] = JSON.generate({ type: 'capture_base' })
+          end
+          general_store.close
+
           store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/namespaces/#{namespace}/db/oca")
           if store.key?(sai)
             store.close
@@ -60,6 +72,17 @@ module V01
 
         private def save_overlay(namespace:, overlay:)
           sai = hashlink_generator.call(overlay)
+
+          general_store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/oca/db/oca")
+          unless general_store.key?(sai)
+            create_file(
+              path: "#{STORAGE_PATH}/oca",
+              filename: sai,
+              content: overlay
+            )
+            general_store[sai] = JSON.generate({ type: 'overlay' })
+          end
+          general_store.close
 
           store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/namespaces/#{namespace}/db/oca")
           if store.key?(sai)
@@ -83,6 +106,20 @@ module V01
             overlays: overlays_sai.sort
           }
           sai = hashlink_generator.call(branch)
+
+          general_store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/oca/db/oca")
+
+          unless general_store.key?(sai)
+            general_store[sai] = JSON.generate(branch.merge({ type: 'bundle' }))
+            general_store.close
+
+            general_bundles_store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/oca/db/cb_bundles")
+
+            general_bundles_store[capture_base_sai] = [] unless general_bundles_store.key?(capture_base_sai)
+            general_bundles_store[capture_base_sai] = (general_bundles_store[capture_base_sai] << sai).uniq
+            general_bundles_store.close
+          end
+
           store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/namespaces/#{namespace}/db/oca")
           if store.key?(sai)
             store.close

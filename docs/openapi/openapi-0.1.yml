@@ -6,10 +6,85 @@ info:
 servers:
   - url: 'http://localhost:9292/api/v0.1'
 tags:
+  - name: schemas
   - name: namespaces
   - name: search
   - name: transformations
 paths:
+  '/schemas':
+    get:
+      tags:
+        - schemas
+      summary: Fetch all OCA Chunks and OCA Bundles
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  anyOf:
+                    - $ref: '#/components/schemas/Bundle'
+                    - $ref: '#/components/schemas/CaptureBase'
+
+  '/schemas/{SAI}':
+    get:
+      tags:
+        - schemas
+      summary: Fetch OCA Chunk or OCA Bundle by SAI
+      parameters:
+        - name: SAI
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Bundle'
+                  - $ref: '#/components/schemas/CaptureBase'
+  '/schemas/{SAI}/bundles':
+    get:
+      tags:
+        - schemas
+      summary: Fetch list of OCA Bundles' SAIs linked to given Capture Base SAI
+      parameters:
+        - name: SAI
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '404':
+          description: Given SAI is not of Capture Base
+  '/schemas/{SAI}/archive':
+    get:
+      tags:
+        - schemas
+      summary: Download OCA archive
+      parameters:
+        - name: SAI
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
 
   '/namespaces/{namespace}/schemas':
     get:

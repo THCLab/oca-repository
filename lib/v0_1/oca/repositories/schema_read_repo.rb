@@ -13,27 +13,29 @@ module V01
         end
 
         def find_by_namespace_sai(namespace:, sai:)
-          return {} unless Dir.exists?("#{STORAGE_PATH}/namespaces/#{namespace}")
-          store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/namespaces/#{namespace}/db/oca")
+          oca_storage_path = namespace ? "#{STORAGE_PATH}/namespaces/#{namespace}" : "#{STORAGE_PATH}/oca"
+          return {} unless Dir.exists?(oca_storage_path)
+          store = Moneta.new(:DBM, file: "#{oca_storage_path}/db/oca")
           record = store.key?(sai) ? JSON.parse(store[sai]) : nil
           store.close
 
           return {} unless record
           return resolve_bundle(namespace: namespace, record: record) if record['type'] == 'bundle'
 
-          JSON.parse(File.read("#{STORAGE_PATH}/namespaces/#{namespace}/#{sai}.json"))
+          JSON.parse(File.read("#{oca_storage_path}/#{sai}.json"))
         end
 
         def find_by_namespace(namespace)
-          return [] unless Dir.exists?("#{STORAGE_PATH}/namespaces/#{namespace}")
-          store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/namespaces/#{namespace}/db/oca")
+          oca_storage_path = namespace ? "#{STORAGE_PATH}/namespaces/#{namespace}" : "#{STORAGE_PATH}/oca"
+          return [] unless Dir.exists?(oca_storage_path)
+          store = Moneta.new(:DBM, file: "#{oca_storage_path}/db/oca")
           records = []
           store.each_key do |key|
             record = JSON.parse(store[key])
             if record['type'] == 'bundle'
               records << resolve_bundle(namespace: namespace, record: record)
             else
-              records << JSON.parse(File.read("#{STORAGE_PATH}/namespaces/#{namespace}/#{key}.json"))
+              records << JSON.parse(File.read("#{oca_storage_path}/#{key}.json"))
             end
           end
           store.close
@@ -78,11 +80,12 @@ module V01
         end
 
         private def resolve_bundle(namespace:, record:)
-          capture_base = JSON.parse(File.read("#{STORAGE_PATH}/namespaces/#{namespace}/#{record['capture_base']}.json"))
+          oca_storage_path = namespace ? "#{STORAGE_PATH}/namespaces/#{namespace}" : "#{STORAGE_PATH}/oca"
+          capture_base = JSON.parse(File.read("#{oca_storage_path}/#{record['capture_base']}.json"))
 
           overlays = []
           record['overlays'].each do |ov_sai|
-            overlays << JSON.parse(File.read("#{STORAGE_PATH}/namespaces/#{namespace}/#{ov_sai}.json"))
+            overlays << JSON.parse(File.read("#{oca_storage_path}/#{ov_sai}.json"))
           end
 
           { capture_base: capture_base, overlays: overlays }
