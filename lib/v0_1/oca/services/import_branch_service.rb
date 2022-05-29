@@ -13,26 +13,45 @@ module V01
         end
 
         def call(namespace, file)
-          schema = extract_zip(file)
+          schema = compose_schema(extract_zip(file))
           schema_sai = schema_write_repo.save(namespace: namespace, schema: schema)
           schema_sai
         end
 
+        private def compose_schema(extracted_files)
+          reference_cb_sais = extracted_files['meta']['files'].entries
+            .select { |k, v| v if k.start_with?('capture_base') }
+            .map { |e| e[1] }
+          root_cb_sai = reference_cb_sais.delete(extracted_files['meta']['root'])
+          schema = fetch_oca(extracted_files, root_cb_sai)
+          return schema if reference_cb_sais.empty?
+
+          references = reference_cb_sais.each_with_object({}) do |sai, memo|
+            memo[sai] = fetch_oca(extracted_files, sai)
+            memo
+          end
+
+          schema.merge({ references: })
+        end
+
+        private def fetch_oca(files, capture_base_sai)
+          {
+            capture_base: files[capture_base_sai],
+            overlays: files.entries.map { |e| e[1] }.select { |ov| ov['capture_base'] == capture_base_sai }
+          }
+        end
+
         private def extract_zip(file)
-          schema = { overlays: [] }
+          files = {}
           Zip::File.open(file) do |zip|
             zip.each do |entry|
-              next unless entry.ftype == :file
+              name, type = entry.name.split('.')
+              next unless type == 'json'
               content = JSON.parse(entry.get_input_stream.read)
-              type = entry.name.split('/').size == 1 ? :capture_base : :overlay
-              if type == :capture_base
-                schema[:capture_base] = content
-              elsif type == :overlay
-                schema[:overlays].push(content)
-              end
+              files[name] = content
             end
           end
-          schema
+          files
         end
       end
     end

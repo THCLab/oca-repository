@@ -32,10 +32,18 @@ module V01
 
           return overlays_sai.first unless schema[:capture_base] && schema[:overlays]
 
+          references_sai = []
+          if schema[:references]
+            schema[:references].entries.each do |cb_sai, reference|
+              references_sai.push(save(namespace:, schema: reference))
+            end
+          end
+
           save_bundle(
             namespace: namespace,
             capture_base_sai: capture_base_sai,
             overlays_sai: overlays_sai,
+            references_sai: references_sai,
             schema: schema
           )
         end
@@ -100,12 +108,14 @@ module V01
           sai
         end
 
-        private def save_bundle(namespace:, capture_base_sai:, overlays_sai:, schema:)
+        private def save_bundle(namespace:, capture_base_sai:, overlays_sai:, references_sai:, schema:)
           branch = {
             capture_base: capture_base_sai,
             overlays: overlays_sai.sort
           }
           sai = hashlink_generator.call(branch)
+
+          branch.merge!(references: references_sai.sort) unless references_sai&.empty?
 
           general_store = Moneta.new(:DBM, file: "#{STORAGE_PATH}/oca/db/oca")
 

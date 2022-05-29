@@ -88,7 +88,19 @@ module V01
             overlays << JSON.parse(File.read("#{oca_storage_path}/#{ov_sai}.json"))
           end
 
-          { capture_base: capture_base, overlays: overlays }
+          references = {}
+          if record['references']
+            record['references'].each do |sai|
+              reference = find_by_namespace_sai(namespace:, sai:)
+              cb_sai = reference[:overlays][0]['capture_base']
+              references[cb_sai] = reference
+            end
+          end
+
+          result = { capture_base:, overlays: }
+          result.merge!(references:) unless references.empty?
+
+          result
         end
       end
     end
