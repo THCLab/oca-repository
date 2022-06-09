@@ -1,6 +1,6 @@
 version: '3'
 services:
-  odca_search_engine:
+  oca_search_engine:
     image: humancolossus/oca-repository:0.3.0
     container_name: oca-repository
     command: /bin/sh -c "bundle exec rackup -o 0.0.0.0"
@@ -10,7 +10,7 @@ services:
     ports:
       - 9292:9292
     networks:
-      - odca
+      - oca
 
   es01:
     image: elasticsearch:8.1.2
@@ -22,7 +22,7 @@ services:
     volumes:
       - data01:/usr/share/elasticsearch/data
     networks:
-      - odca
+      - oca
     ports:
       - 9200:9200
 
@@ -33,7 +33,7 @@ services:
     volumes:
       - ./docs/openapi/openapi-0.1.yml:/openapi-0.1.yml
     networks:
-      - odca
+      - oca
     ports:
       - 8000:8080
 
@@ -42,5 +42,5 @@ volumes:
     driver: local
 
 networks:
-  odca:
+  oca:
     external: true
