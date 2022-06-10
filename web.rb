@@ -3,10 +3,12 @@
 require 'roda'
 require 'json'
 require 'plugins/json_header'
+require 'plugins/cors'
 require 'elasticsearch'
 
 class Web < Roda
   plugin :json
+  plugin :cors
   plugin :json_parser
   plugin :json_header
 
