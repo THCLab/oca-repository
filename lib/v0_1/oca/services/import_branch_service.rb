@@ -20,8 +20,7 @@ module V01
 
         private def compose_schema(extracted_files)
           reference_cb_sais = extracted_files['meta']['files'].entries
-            .select { |k, v| v if k.start_with?('capture_base') }
-            .map { |e| e[1] }
+            .map { |e| e[0] }
           root_cb_sai = reference_cb_sais.delete(extracted_files['meta']['root'])
           schema = fetch_oca(extracted_files, root_cb_sai)
           return schema if reference_cb_sais.empty?
@@ -47,6 +46,7 @@ module V01
             zip.each do |entry|
               name, type = entry.name.split('.')
               next unless type == 'json'
+
               content = JSON.parse(entry.get_input_stream.read)
               files[name] = content
             end
