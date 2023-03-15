@@ -128,8 +128,11 @@ class Web < Roda
 
         r.on 'search' do
           schema_read_repo = ::V01::OCA::Repositories::SchemaReadRepo.new(es)
+          get_schema_bundles = ::V01::OCA::Services::GetSchemaBundlesService.new
+
           service = ::V01::OCA::Services::SearchSchemasService.new(
-            schema_read_repo
+            schema_read_repo,
+            get_schema_bundles
           )
           service.call(r.params)
         end

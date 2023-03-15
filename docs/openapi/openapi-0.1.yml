@@ -259,6 +259,10 @@ paths:
                           type: string
                         capture_base_sai:
                           type: string
+                        bundles_sais:
+                          type: array
+                          items:
+                            type: string
                   - type: array
                     items:
                       type: object
@@ -267,18 +271,24 @@ paths:
                           type: string
                         capture_base_sai:
                           type: string
+                        bundles_sais:
+                          type: array
+                          items:
+                            type: string
               examples:
                 Suggest:
                   value: [{
                     matching: 'ipsum',
                     name: 'Lorem ipsum',
                     namespace: 'test',
-                    capture_base_sai: 'ETaSNrWxbAg_bUsIWuWtnpE0oip5m6VKgaPGb_aU_uBA'
+                    capture_base_sai: 'ETaSNrWxbAg_bUsIWuWtnpE0oip5m6VKgaPGb_aU_uBA',
+                    bundles_sais: ['E2oRZ5zEKxTfTdECW-v2Q7bM_H0OD0ko7IcCwdo_u9co']
                   }]
                 Query:
                   value: [{
                     namespace: 'test',
-                    capture_base_sai: 'ETaSNrWxbAg_bUsIWuWtnpE0oip5m6VKgaPGb_aU_uBA'
+                    capture_base_sai: 'ETaSNrWxbAg_bUsIWuWtnpE0oip5m6VKgaPGb_aU_uBA',
+                    bundles_sais: ['E2oRZ5zEKxTfTdECW-v2Q7bM_H0OD0ko7IcCwdo_u9co']
                   }]
 
 
