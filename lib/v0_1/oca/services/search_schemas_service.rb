@@ -22,12 +22,14 @@ module V01
                        limit: params.fetch(:limit) || 1000
                      )
                    end
-          result.merge(
-            bundles_sais: get_schema_bundles.call(
-              namespace: params.fetch(:namespace),
-              sai: result.fetch(:capture_base_sai)
+          result.map do |r|
+            r.merge(
+              bundles_sais: get_schema_bundles.call(
+                namespace: r.fetch(:namespace),
+                sai: r.fetch(:capture_base_sai)
+              ) || []
             )
-          )
+          end
         rescue
           []
         end
