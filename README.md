@@ -1,5 +1,7 @@
 # OCA Repository
 
+DEPRECATED: check https://github.com/THCLab/oca-repository-rs
+
 ## API
 
 check [swagger](https://repository.oca.argo.colossi.network) for reference
